@@ -20,11 +20,11 @@ package bisq.desktop.main.portfolio.closedtrades;
 import bisq.desktop.common.model.ActivatableWithDataModel;
 import bisq.desktop.common.model.ViewModel;
 import bisq.desktop.util.DisplayUtils;
-
 import bisq.core.account.witness.AccountAgeWitnessService;
 import bisq.core.locale.CurrencyUtil;
 import bisq.core.locale.Res;
 import bisq.core.offer.OpenOffer;
+import bisq.core.provider.fee.FeeService;
 import bisq.core.trade.Tradable;
 import bisq.core.trade.Trade;
 import bisq.core.util.FormattingUtils;
@@ -87,7 +87,7 @@ class ClosedTradesViewModel extends ActivatableWithDataModel<ClosedTradesDataMod
             return "";
     }
 
-    String getTxFee(ClosedTradableListItem item) {
+    String getMakerMiningFee(ClosedTradableListItem item) {
         if (item == null)
             return "";
         Tradable tradable = item.getTradable();
@@ -97,14 +97,26 @@ class ClosedTradesViewModel extends ActivatableWithDataModel<ClosedTradesDataMod
             return formatter.formatCoin(tradable.getOffer().getTxFee());
     }
 
-    String getMakerFee(ClosedTradableListItem item) {
+    String getTakerMiningFee(ClosedTradableListItem item) {
         if (item == null)
             return "";
         Tradable tradable = item.getTradable();
         if (tradable instanceof Trade)
             return formatter.formatCoin(((Trade) tradable).getTakerFee());
         else
-            return formatter.formatCoin(tradable.getOffer().getMakerFee());
+            return formatter.formatCoin(tradable.getOffer().getTxFee().multiply(3L));
+    }
+
+    String getMakerTradingFee(ClosedTradableListItem item) {
+        if (item == null)
+            return "";
+        return formatter.formatCoin(FeeService.getMakerFeePerBtc(true));
+    }
+
+    String getTakerTradingFee(ClosedTradableListItem item) {
+        if (item == null)
+            return "";
+        return formatter.formatCoin(FeeService.getTakerFeePerBtc(true));
     }
 
     String getBuyerSecurityDeposit(ClosedTradableListItem item) {
